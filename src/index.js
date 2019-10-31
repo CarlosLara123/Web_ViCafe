@@ -5,7 +5,7 @@ var app = require('./app');
 
 //CONECCION A LA BASE DE DATOS
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/Red_Social_JS', { useNewUrlParser: true }).then(() => {
+mongoose.connect('mongodb://localhost:27017/Red_Social_JS', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     console.log('[ DATABASE RUNNING CORRECTLY ]')
 
     //CREAR SERVIDOR
