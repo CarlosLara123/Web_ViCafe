@@ -8,6 +8,7 @@ const bodyparser = require("body-parser");
 var user_routes = require('./routes/user.routes');
 var history_routes = require('./routes/history.routes');
 var publication_routes = require('./routes/publication.routes');
+var farmer_routes = require('./routes/farmer.routes');
 // var message_routes = require('./routes/messageRoutes');
 
 //MIDDELWARES
@@ -28,6 +29,7 @@ app.use((req, res, next) =>{
 app.use('/api', user_routes);
 app.use('/api', history_routes);
 app.use('/api', publication_routes);
+app.use('/api', farmer_routes);
 // app.use('/api', message_routes);
 
 //EXPORTAR

@@ -1,6 +1,6 @@
 'use strict'
 
-const History = requier('../models/history');
+const History = require('../models/history.model');
 const path = require('path');
 const fs = require('fs');
 

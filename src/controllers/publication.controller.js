@@ -30,7 +30,7 @@ function subirImagen(req, res) {
             Publication.findOne({_id: publicationId}).exec((err, publication)=>{
                 if(err) return res.status(500).send({message: "Error en la peticion"});
                 if(publication){
-                    Publication.findByIdAndUpdate(publicationId, {file: file_name}, {new:true},(err, publicationUpdate)=>{
+                    Publication.findByIdAndUpdate(publicationId, {image: file_name}, {new:true},(err, publicationUpdate)=>{
                         if(err) return res.status(500).send({message: 'Error en la peticion'})
                         
                         if(!publicationUpdate) return res.status(404).send({message: 'no se a podido actualizar el usuario'})
@@ -73,40 +73,12 @@ function addPublication(req, res) {
     if(params.title && params.text){
         publication.title = params.title;
         publication.text = params.text;
-
-        if(req.files){
-            var file_path = req.files.image.path;
-            console.log(file_path);
-    
-            var file_split = file_path.split('\\');
-            console.log(file_split);
-    
-            var file_name = file_split[3];
-            console.log(file_name);
-    
-            var ext_xplit = file_name.split('\.');
-            console.log(ext_xplit);
-    
-            var file_ext = ext_xplit[1];
-            console.log(file_ext);
-    
-            if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif'){
-                Publication.findByIdAndUpdate(publicationId, {file: file_name}, {new:true},(err, publicationUpdate)=>{
-                    if(err) return res.status(500).send({message: 'Error en la peticion'})
-                            
-                    if(!publicationUpdate) return res.status(404).send({message: 'no se a podido actualizar el usuario'})
-                            
-                    return res.status(200).send({publication: publicationUpdate})
-                })
-            }else{
-                return removeFilerOfUploads(res, file_path, 'Extension no valida')
-            }
-        }
+        publication.image = "";
 
         publication.save((err, newPublication)=>{
             if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
             if(!newPublication) return res.status(404).send({ message: 'ERROR!, algún dato esta mal' });
-            return res.status(200).send({ newPublication, message : 'Se a publicado un nuevo evento' });
+            return res.status(200).send({ newPublication, message : 'Se a publicado un nuevo evento', file: publication.image });
         })
 
     }
@@ -132,7 +104,7 @@ function getAllPublications(req, res){
         page = req.params.page;
     }
 
-    Publication.find().sort('-created_at').paginate(page,itemsPage,(err,Publications,total)=>{
+    Publication.find().paginate(page,itemsPage,(err,Publications,total)=>{
         if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
         if(!Publications) return res.status(404).send({ message: 'ERROR!, no se encontro la publicación' });
         return res.status(200).send({ 
@@ -147,20 +119,20 @@ function updateOnePublication(req,res){
     let publicationID = req.params.id;
     let params = req.body;
     
-    Publication.findByIdAndUpdate({_id: publicationID}, params, {new : true}, (err, UpdatePublication)=>{
+    Publication.findByIdAndUpdate(publicationID, params, {new : true}, (err, UpdatePublication)=>{
         if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
             if(!UpdatePublication) return res.status(404).send({ message: 'ERROR!, no se puede actualizar' });
-            return res.status(200).send({ UpdatePublication, message : 'Se actualizo una publicación' });
+            return res.status(200).send({ publication : UpdatePublication, message : 'Se actualizo una publicación' });
     })
 }
 
 function deleteOnePublication(req,res){
     let publicationID = req.params.id;
     
-    Publication.findByIdAndDelete({_id: publicationID}, (err, UpdatePublication)=>{
+    Publication.findByIdAndDelete({_id: publicationID}, (err, deletePublication)=>{
         if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
-            if(!UpdatePublication) return res.status(404).send({ message: 'ERROR!, no se pudo eliminar la publicación' });
-            return res.status(200).send({ UpdatePublication, message : 'Se elimino una publicación' });
+            if(!deletePublication) return res.status(404).send({ message: 'ERROR!, no se pudo eliminar la publicación' });
+            return res.status(200).send({ deletePublication, message : 'Se elimino una publicación' });
     })
 }
 

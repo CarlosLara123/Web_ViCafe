@@ -2,21 +2,22 @@
 
 const User = require('../models/user.model')
 const bcrypt = require('bcrypt-nodejs');
+var jwt = require('../services/jwt');
 
 function userRegister(req, res) {
     var user = new User();
     var params = req.body;
     
     if(params.name && params.surname && params.nickname && params.password){
-        user.name = params.body.name;
-        user.surname = params.body.surname;
-        user.nickname = params.body.nickname;
-        user.password = params.body.password;
+        user.name = params.name;
+        user.surname = params.surname;
+        user.nickname = params.nickname;
+        user.password = params.password;
         user.role = 'ROLE_1';
 
         User.find({$or:[
             { nickname : user.nickname }
-        ]}).excec((err, users)=>{
+        ]}).exec((err, users)=>{
             if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
 
             if(users && users.length >= 1){
