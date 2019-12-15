@@ -73,7 +73,7 @@ function addFarmer(req, res) {
     if(params.name && params.tasa && params.coffes && params.contact){
 
         farmer.name = params.name;
-        farmer.tasa = params.tasa;
+        farmer.tasa = params.tasa + " SCAA";
         farmer.coffes = params.coffes;
         farmer.address = params.address;
         farmer.contact = params.contact;

@@ -1,6 +1,6 @@
 'use strict'
 
-const History = require('../models/history.model');
+var History = require('../models/history.model');
 const path = require('path');
 const fs = require('fs');
 
@@ -8,15 +8,16 @@ function addHistory(req, res) {
     let history = new History();
     var params = req.body;
 
-    if(params.year && params.text){
-        history.year = params.history;
+    if(params.year && params.text && params.title){
+        history.title = params.title;
+        history.year = params.year;
         history.text = params.text;
-        history.image = null;
+        history.image = "";
 
         history.save((err, historyStored)=>{
             if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
             if(!historyStored) return res.status(404).send({ message: 'ERROR!, no se agregado la historia' });
-            return res.status(200).send({ historyStored, message : 'Historia agregada' });
+            return res.status(200).send({ result : historyStored, message : 'Historia agregada' });
         })
     }
     else if(!params.year) return res.status(500).send({ message: 'ERROR!, no ingresaste el año' });
@@ -26,8 +27,8 @@ function addHistory(req, res) {
 function getOneHistory(req, res) {
     let historyID = req.params.id;
     
-    History.findById(historyID,(err, result)=>{
-        if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
+    History.findById( historyID ,(err, result)=>{
+        if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal...' });
         if(!result) return res.status(404).send({ message: 'ERROR!, no se a encontrado ninguna historia' });
         return res.status(200).send({ result });
     })
@@ -42,8 +43,8 @@ function getAllHistory(req, res){
     }
 
     History.find().sort('year').paginate(page,itemsPage,(err,result,total)=>{
-        if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
-        if(!result) return res.status(404).send({ message: 'ERROR!, no se encontro ningun registro' });
+        if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal Ñ' });
+        if(!result) return res.status(404).send({ message: 'ERROR!, no se encontraron historias' });
         return res.status(200).send({ 
             result,
             total: total,
@@ -74,7 +75,7 @@ function updateOneHistory(req, res) {
 }
 
 function setImagen(req, res) {
-    var publicationId = req.params.id;
+    var historyID = req.params.id;
 
     if(req.files){
         var file_path = req.files.image.path;
@@ -94,18 +95,18 @@ function setImagen(req, res) {
 
         if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif'){
             
-            Publication.findOne({_id: publicationId}).exec((err, publication)=>{
+            History.findOne({_id: historyID}).exec((err, history)=>{
                 if(err) return res.status(500).send({message: "Error en la peticion"});
-                if(publication){
-                    Publication.findByIdAndUpdate(publicationId, {file: file_name}, {new:true},(err, publicationUpdate)=>{
+                if(history){
+                    History.findByIdAndUpdate(historyID, { image : file_name}, {new:true},(err, result)=>{
                         if(err) return res.status(500).send({message: 'Error en la peticion'})
                         
-                        if(!publicationUpdate) return res.status(404).send({message: 'no se a podido actualizar el usuario'})
+                        if(!result) return res.status(404).send({message: 'no se a podido actualizar la historia'})
                         
-                        return res.status(200).send({publication: publicationUpdate})
+                        return res.status(200).send({ result })
                     })
                 }else{
-                    return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta publicacion')
+                    return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta historia')
                 }
             });            
         }else{
@@ -122,7 +123,7 @@ function removeFilerOfUploads(res, file_path, message) {
 
 function getImageFile(req, res) {
     var image_file = req.params.imageFile;
-    var path_file = './src/uploads/publications/' + image_file;
+    var path_file = './src/uploads/history/' + image_file;
 
     fs.exists(path_file, (exists) =>{
         if(exists){
