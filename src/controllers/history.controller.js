@@ -5,6 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const aws = require('aws-sdk');
 
+var s3 = new aws.S3({
+    accessKeyId: 'AKIAI7LPWYEZCYVBVWBQ',
+    secretAccessKey: '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'
+});
+
 function addHistory(req, res) {
     let history = new History();
     var params = req.body;
@@ -104,7 +109,22 @@ function setImagen(req, res) {
                         
                         if(!result) return res.status(404).send({message: 'no se a podido actualizar la historia'})
                         
-                        return res.status(200).send({ result })
+                        if(result){
+                            var params = {
+                                Bucket: 'covicafe-assets',
+                                Key: file_name,
+                                Body: file_path
+                            }
+                            s3.upload(params, (err, data)=>{
+                                if(err){
+                                    console.log('no se pudo')
+                                    throw err;
+                                }else{
+                                    console.log('S3 success', data)
+                                    return res.status(200).send({ result })
+                                }
+                            })      
+                        }
                     })
                 }else{
                     return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta historia')

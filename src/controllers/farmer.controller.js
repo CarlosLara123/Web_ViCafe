@@ -5,6 +5,12 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment')
 const mongoosePaginate = require('mongoose-pagination');
+const aws = require('aws-sdk');
+
+var s3 = new aws.S3({
+    accessKeyId: 'AKIAI7LPWYEZCYVBVWBQ',
+    secretAccessKey: '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'
+});
 
 function subirImagen(req, res) {
     var farmerId = req.params.id;
@@ -35,7 +41,22 @@ function subirImagen(req, res) {
                         
                         if(!updateFarmer) return res.status(404).send({message: 'no se a podido agregar la imagen'})
                         
-                        return res.status(200).send({farmer: updateFarmer})
+                        if(updateFarmer){
+                            var params = {
+                                Bucket: 'covicafe-assets',
+                                Key: file_name,
+                                Body: file_path
+                            }
+                            s3.upload(params, (err, data)=>{
+                                if(err){
+                                    console.log('no se pudo')
+                                    throw err;
+                                }else{
+                                    console.log('S3 success', data)
+                                    return res.status(200).send({farmer: updateFarmer})
+                                }
+                            })      
+                        }
                     })
                 }else{
                     return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta publicacion')
