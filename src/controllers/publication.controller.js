@@ -11,7 +11,6 @@ var s3 = new aws.S3({
     accessKeyId: 'AKIAI7LPWYEZCYVBVWBQ',
     secretAccessKey: '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'
 });
-
 function subirImagen(req, res) {
     var publicationId = req.params.id;
 
@@ -43,7 +42,7 @@ function subirImagen(req, res) {
                         
                         if(publicationUpdate){
                             var params = {
-                                Bucket: 'covicafe-assets',
+                                Bucket: 'covicafe-assets',  
                                 Key: file_name,
                                 Body: file_path
                             }
@@ -76,8 +75,8 @@ function removeFilerOfUploads(res, file_path, message) {
 
 function getImageFile(req, res) {
     var image_file = req.params.imageFile;
-    var path_file = './src/uploads/publications/' + image_file;
-    
+    var path_file = './src/uploads/publication/' + image_file;
+
     fs.exists(path_file, (exists) =>{
         if(exists){
             res.sendFile(path.resolve(path_file));
