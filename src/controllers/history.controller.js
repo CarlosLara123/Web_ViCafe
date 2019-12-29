@@ -3,6 +3,7 @@
 var History = require('../models/history.model');
 const path = require('path');
 const fs = require('fs');
+const aws = require('aws-sdk');
 
 function addHistory(req, res) {
     let history = new History();

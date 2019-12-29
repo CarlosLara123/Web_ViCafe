@@ -55,7 +55,7 @@ function removeFilerOfUploads(res, file_path, message) {
 
 function getImageFile(req, res) {
     var image_file = req.params.imageFile;
-    var path_file = './src/uploads/famers/' + image_file;
+    var path_file = './src/uploads/farmers/' + image_file;
 
     fs.exists(path_file, (exists) =>{
         if(exists){
