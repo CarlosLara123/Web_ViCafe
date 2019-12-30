@@ -8,8 +8,8 @@ const mongoosePaginate = require('mongoose-pagination');
 const aws = require('aws-sdk');
 
 var s3 = new aws.S3({
-    accessKeyId: 'AKIAI7LPWYEZCYVBVWBQ',
-    secretAccessKey: '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'
+    accessKeyId: 'AKIAIXGD6TWNOGL5FYYQ',
+    secretAccessKey: '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'
 });
 function subirImagen(req, res) {
     var publicationId = req.params.id;
@@ -75,15 +75,15 @@ function removeFilerOfUploads(res, file_path, message) {
 
 function getImageFile(req, res) {
     var image_file = req.params.imageFile;
-    var path_file = './src/uploads/publication/' + image_file;
+    var path_file = './src/uploads/publications/' + image_file;
 
-    fs.exists(path_file, (exists) =>{
-        if(exists){
-            res.sendFile(path.resolve(path_file));
-        }else{
-            res.status(200).send({message: 'no existe la imagen'})
-        }
-    })
+            fs.exists(path_file, (exists) =>{
+                if(exists){
+                    res.sendFile(path.resolve(path_file));
+                }else{
+                    res.status(200).send({message: 'no existe la imagen'})
+                }
+            })
 }
 
 function addPublication(req, res) {
