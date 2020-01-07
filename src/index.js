@@ -2,6 +2,7 @@
 
 var mongoose = require("mongoose");
 var app = require('./app');
+require ('dotenv').config();
 
 
 //CONECCION A LA BASE DE DATOS 1tEWpDbnojwjTzSs

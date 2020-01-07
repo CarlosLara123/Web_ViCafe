@@ -6,11 +6,14 @@ const fs = require('fs');
 const moment = require('moment')
 const mongoosePaginate = require('mongoose-pagination');
 const aws = require('aws-sdk');
+const cloudinary = require("cloudinary");
 
-var s3 = new aws.S3({
-    accessKeyId: 'AKIAIXGD6TWNOGL5FYYQ',
-    secretAccessKey: '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'
-});
+cloudinary.config({
+    cloud_name: 'dftejnbqx',
+    api_key: '664672147697496',
+    api_secret: 'a_iqaz0mjuJfwegq8E99TO9GXh4',
+})
+
 function subirImagen(req, res) {
     var publicationId = req.params.id;
 
@@ -37,24 +40,13 @@ function subirImagen(req, res) {
                 if(publication){
                     Publication.findByIdAndUpdate(publicationId, {image: file_name}, {new:true},(err, publicationUpdate)=>{
                         if(err) return res.status(500).send({message: 'Error en la peticion'})
-                        
+                            
                         if(!publicationUpdate) return res.status(404).send({message: 'no se a podido actualizar el usuario'})
-                        
+                            
                         if(publicationUpdate){
-                            var params = {
-                                Bucket: 'covicafe-assets',  
-                                Key: file_name,
-                                Body: file_path
-                            }
-                            s3.upload(params, (err, data)=>{
-                                if(err){
-                                    console.log('no se pudo')
-                                    throw err;
-                                }else{
-                                    console.log('S3 success', data)
-                                    return res.status(200).send({publication: publicationUpdate})
-                                }
-                            })      
+                            cloudinary.v2.uploader.upload(file_path)
+                            console.log(publicationUpdate)
+                            return res.status(200).send({publication: publicationUpdate})
                         }
                     })
                 }else{
@@ -77,13 +69,13 @@ function getImageFile(req, res) {
     var image_file = req.params.imageFile;
     var path_file = './src/uploads/publications/' + image_file;
 
-            fs.exists(path_file, (exists) =>{
-                if(exists){
-                    res.sendFile(path.resolve(path_file));
-                }else{
-                    res.status(200).send({message: 'no existe la imagen'})
-                }
-            })
+    fs.exists(path_file, (exists) =>{
+        if(exists){
+            res.sendFile(path.resolve(path_file));
+        }else{
+            res.status(200).send({message: 'no existe la imagen'})
+        }
+    })
 }
 
 function addPublication(req, res) {
