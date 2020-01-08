@@ -6,7 +6,8 @@ var Schema = mongoose.Schema;
 var publicationSchema = Schema({
     title : String,
     text : String,
-    image : String
+    image : String,
+    url: String
 })
 
 module.exports = mongoose.model('Publication', publicationSchema)
