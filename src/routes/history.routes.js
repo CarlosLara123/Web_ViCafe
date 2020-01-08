@@ -11,7 +11,7 @@ var md_subir = multiparty({uploadDir: './src/uploads/history'});
 var api = express.Router();
 
 api.post('/history/add', md_auth.ensureAuth, HistoryController.addHistory);
-api.post('/upload-image-history/:id', [md_auth.ensureAuth, md_subir], HistoryController.setImagen);
+api.post('/upload-image-history/:id', md_auth.ensureAuth, HistoryController.setImagen);
 api.get('/history/:id', HistoryController.getOneHistory);
 api.get('/history/all/:page?', HistoryController.getAllHistory);
 api.get('/get-image-history/:imagefile', HistoryController.getImageFile);

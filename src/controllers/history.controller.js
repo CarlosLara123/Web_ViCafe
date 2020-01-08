@@ -3,12 +3,13 @@
 var History = require('../models/history.model');
 const path = require('path');
 const fs = require('fs');
-const aws = require('aws-sdk');
+const cloudinary = require("cloudinary");
 
-var s3 = new aws.S3({
-    accessKeyId: 'AKIAI7LPWYEZCYVBVWBQ',
-    secretAccessKey: '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'
-});
+cloudinary.config({
+    cloud_name: 'dftejnbqx',
+    api_key: '664672147697496',
+    api_secret: 'a_iqaz0mjuJfwegq8E99TO9GXh4',
+})
 
 function addHistory(req, res) {
     let history = new History();
@@ -19,6 +20,7 @@ function addHistory(req, res) {
         history.year = params.year;
         history.text = params.text;
         history.image = "";
+        history.url = "";
 
         history.save((err, historyStored)=>{
             if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
@@ -101,29 +103,18 @@ function setImagen(req, res) {
 
         if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif'){
             
-            History.findOne({_id: historyID}).exec((err, history)=>{
+            History.findOne({_id: historyID}).exec( async (err, history)=>{
                 if(err) return res.status(500).send({message: "Error en la peticion"});
+                var result = await cloudinary.v2.uploader.upload(file_path);
                 if(history){
-                    History.findByIdAndUpdate(historyID, { image : file_name}, {new:true},(err, result)=>{
+                    History.findByIdAndUpdate(historyID, { image : result.public_id, url : result.url}, {new:true},(err, result)=>{
                         if(err) return res.status(500).send({message: 'Error en la peticion'})
                         
                         if(!result) return res.status(404).send({message: 'no se a podido actualizar la historia'})
                         
                         if(result){
-                            var params = {
-                                Bucket: 'covicafe-assets',
-                                Key: file_name,
-                                Body: file_path
-                            }
-                            s3.upload(params, (err, data)=>{
-                                if(err){
-                                    console.log('no se pudo')
-                                    throw err;
-                                }else{
-                                    console.log('S3 success', data)
-                                    return res.status(200).send({ result })
-                                }
-                            })      
+                            console.log(result)
+                            return res.status(200).send({ result })      
                         }
                     })
                 }else{

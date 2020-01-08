@@ -7,7 +7,8 @@ var historySchema = mongoose.Schema({
     title : String,
     year : String,
     text : String,
-    image : String
+    image : String,
+    url : String
 })
 
 module.exports = mongoose.model('History', historySchema)
