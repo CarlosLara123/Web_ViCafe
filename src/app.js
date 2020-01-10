@@ -13,7 +13,7 @@ var farmer_routes = require('./routes/farmer.routes');
 // var message_routes = require('./routes/messageRoutes');
 
 //MIDDELWARES
-app.use(cors());
+//app.use(cors());
 app.use(bodyparser.urlencoded({ extended: false}));
 app.use(bodyparser.json());
 
