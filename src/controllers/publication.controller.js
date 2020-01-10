@@ -17,28 +17,12 @@ cloudinary.config({
 function subirImagen(req, res) {
     var publicationId = req.params.id;
 
-    if (req.files) {
-        var file_path = req.files.image.path;
-        console.log(file_path);
-
-        var file_split = file_path.split('\\');
-        console.log(file_split);
-
-        var file_name = file_split[3];
-        console.log(file_name);
-
-        var ext_xplit = file_name.split('\.');
-        console.log(ext_xplit);
-
-        var file_ext = ext_xplit[1];
-        console.log(file_ext);
-
-        if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif') {
-            Publication.findById(publicationId, async (err, data) => {
-                if (err) return res.status(500).send({ message: 'Error en la peticion' })
+    if(req.files){
+        
+        Publication.findById(publicationId, async (err) => {
+            if (err) return res.status(500).send({ message: 'Error en la peticion' })
                 
-                if(!data) return res.status(500).send({ message: 'EROOOOOOOOR' })
-                var result = await cloudinary.v2.uploader.upload(file_path)
+            var result = await cloudinary.v2.uploader.upload(req.files.image.path)
 
                 Publication.findByIdAndUpdate(publicationId, { image: result.public_id, url: result.url }, { new: true }, (err, publicationUpdate) => {
                     if (err) return res.status(500).send({ message: 'Error en la peticion' })
@@ -51,13 +35,49 @@ function subirImagen(req, res) {
                         return res.status(200).send({ publication: publicationUpdate })
                     }
                 })
-            })
-        } else {
-            return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta publicacion')
-        }
-    } else {
-        return removeFilerOfUploads(res, file_path, 'Extension no valida')
+        })
     }
+//     if (req.files) {
+//         var file_path = req.files.image.path;
+//         console.log(file_path);
+
+//         var file_split = file_path.split('\\');
+//         console.log(file_split);
+
+//         var file_name = file_split[3];
+//         console.log(file_name);
+
+//         var ext_xplit = file_name.split('\.');
+//         console.log(ext_xplit);
+
+//         var file_ext = ext_xplit[1];
+//         console.log(file_ext);
+
+//         if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif') {
+//             Publication.findById(publicationId, async (err, data) => {
+//                 if (err) return res.status(500).send({ message: 'Error en la peticion' })
+                
+//                 if(!data) return res.status(500).send({ message: 'EROOOOOOOOR' })
+//                 var result = await cloudinary.v2.uploader.upload(file_path)
+
+//                 Publication.findByIdAndUpdate(publicationId, { image: result.public_id, url: result.url }, { new: true }, (err, publicationUpdate) => {
+//                     if (err) return res.status(500).send({ message: 'Error en la peticion' })
+
+//                     if (!publicationUpdate) return res.status(404).send({ message: 'no se a podido actualizar el usuario' })
+
+//                     if (publicationUpdate) {
+//                         console.log(result)
+//                         console.log(publicationUpdate)
+//                         return res.status(200).send({ publication: publicationUpdate })
+//                     }
+//                 })
+//             })
+//     } else {
+//         return removeFilerOfUploads(res, file_path, 'Extension no valida')
+//     }
+// }else{
+//     return res.status(500).send()
+// }
 
 }
 
