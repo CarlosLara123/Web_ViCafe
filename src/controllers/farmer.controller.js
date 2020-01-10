@@ -5,86 +5,37 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment')
 const mongoosePaginate = require('mongoose-pagination');
-const aws = require('aws-sdk');
+const cloudinary = require("cloudinary");
 
-var s3 = new aws.S3({
-    accessKeyId: 'AKIAI7LPWYEZCYVBVWBQ',
-    secretAccessKey: '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'
-});
+cloudinary.config({
+    cloud_name: 'dftejnbqx',
+    api_key: '664672147697496',
+    api_secret: 'a_iqaz0mjuJfwegq8E99TO9GXh4',
+})
 
 function subirImagen(req, res) {
     var farmerId = req.params.id;
 
     if(req.files){
-        var file_path = req.files.image.path;
-        console.log(file_path);
+        
+        Farmer.findById(farmerId, async (err) => {
+            if (err) return res.status(500).send({ message: 'Error en la peticion' })
+                
+            var result = await cloudinary.v2.uploader.upload(req.files.image.path)
 
-        var file_split = file_path.split('\\');
-        console.log(file_split);
+                Farmer.findByIdAndUpdate(farmerId, { image: result.public_id, url: result.url }, { new: true }, (err, farmerUpdate) => {
+                    if (err) return res.status(500).send({ message: 'Error en la peticion' })
 
-        var file_name = file_split[3];
-        console.log(file_name);
+                    if (!farmerUpdate) return res.status(404).send({ message: 'no se a podido actualizar el socio' })
 
-        var ext_xplit = file_name.split('\.');
-        console.log(ext_xplit);
-
-        var file_ext = ext_xplit[1];
-        console.log(file_ext);
-
-        if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif'){
-            
-            Farmer.findOne({_id: farmerId}).exec((err, farmer)=>{
-                if(err) return res.status(500).send({message: "Error en la peticion"});
-                if(farmer){
-                    Farmer.findByIdAndUpdate(farmerId, {image: file_name}, {new:true},(err, updateFarmer)=>{
-                        if(err) return res.status(500).send({message: 'Error en la peticion'})
-                        
-                        if(!updateFarmer) return res.status(404).send({message: 'no se a podido agregar la imagen'})
-                        
-                        if(updateFarmer){
-                            var params = {
-                                Bucket: 'covicafe-assets',
-                                Key: file_name,
-                                Body: file_path
-                            }
-                            s3.upload(params, (err, data)=>{
-                                if(err){
-                                    console.log('no se pudo')
-                                    throw err;
-                                }else{
-                                    console.log('S3 success', data)
-                                    return res.status(200).send({farmer: updateFarmer})
-                                }
-                            })      
-                        }
-                    })
-                }else{
-                    return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta publicacion')
-                }
-            });            
-        }else{
-            return removeFilerOfUploads(res, file_path, 'Extension no valida')
-        }
+                    if (farmerUpdate) {
+                        console.log(result)
+                        console.log(farmerUpdate)
+                        return res.status(200).send({ farmer: farmerUpdate })
+                    }
+                })
+        })
     }
-}
-
-function removeFilerOfUploads(res, file_path, message) {
-    fs.unlink(file_path, (err)=>{
-        return res.status(200).send({message: message})
-    })
-}
-
-function getImageFile(req, res) {
-    var image_file = req.params.imageFile;
-    var path_file = './src/uploads/farmers/' + image_file;
-
-    fs.exists(path_file, (exists) =>{
-        if(exists){
-            res.sendFile(path.resolve(path_file));
-        }else{
-            res.status(200).send({message: 'no existe la imagen'})
-        }
-    })
 }
 
 function addFarmer(req, res) {
@@ -97,8 +48,8 @@ function addFarmer(req, res) {
         farmer.tasa = params.tasa + " SCAA";
         farmer.coffes = params.coffes;
         farmer.address = params.address;
-        farmer.contact = params.contact;
         farmer.image = "";
+        farmer.url = "";
 
         farmer.save((err, newFarmer)=>{
             if(err) return res.status(500).send({ message: 'ERROR!, algo salio mal' });
@@ -166,7 +117,6 @@ function deleteOneFarmer(req,res){
 
 module.exports = {
     subirImagen,
-    getImageFile,
     addFarmer,
     getAllFarmers,
     getOneFarmer,

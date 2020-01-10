@@ -37,66 +37,7 @@ function subirImagen(req, res) {
                 })
         })
     }
-//     if (req.files) {
-//         var file_path = req.files.image.path;
-//         console.log(file_path);
 
-//         var file_split = file_path.split('\\');
-//         console.log(file_split);
-
-//         var file_name = file_split[3];
-//         console.log(file_name);
-
-//         var ext_xplit = file_name.split('\.');
-//         console.log(ext_xplit);
-
-//         var file_ext = ext_xplit[1];
-//         console.log(file_ext);
-
-//         if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif') {
-//             Publication.findById(publicationId, async (err, data) => {
-//                 if (err) return res.status(500).send({ message: 'Error en la peticion' })
-                
-//                 if(!data) return res.status(500).send({ message: 'EROOOOOOOOR' })
-//                 var result = await cloudinary.v2.uploader.upload(file_path)
-
-//                 Publication.findByIdAndUpdate(publicationId, { image: result.public_id, url: result.url }, { new: true }, (err, publicationUpdate) => {
-//                     if (err) return res.status(500).send({ message: 'Error en la peticion' })
-
-//                     if (!publicationUpdate) return res.status(404).send({ message: 'no se a podido actualizar el usuario' })
-
-//                     if (publicationUpdate) {
-//                         console.log(result)
-//                         console.log(publicationUpdate)
-//                         return res.status(200).send({ publication: publicationUpdate })
-//                     }
-//                 })
-//             })
-//     } else {
-//         return removeFilerOfUploads(res, file_path, 'Extension no valida')
-//     }
-// }else{
-//     return res.status(500).send()
-// }
-
-}
-
-function removeFilerOfUploads(res, file_path, message) {
-    fs.unlink(file_path, (err) => {
-        return res.status(200).send({ message: message })
-    })
-}
-
-function getImageFile(req, res) {
-    var image_file = req.params.imageFile;
-    var path_file = 'http://res.cloudinary.com/dftejnbqx/image/upload/v1578455124/' + image_file;
-
-    var image = cloudinary.image ( 
-        path_file, 
-        { type : " fetch " }
-    )
-
-    res.sendFile(image)
 }
 
 function addPublication(req, res) {
@@ -172,7 +113,6 @@ function deleteOnePublication(req, res) {
 
 module.exports = {
     subirImagen,
-    getImageFile,
     addPublication,
     getAllPublications,
     getOnePublication,

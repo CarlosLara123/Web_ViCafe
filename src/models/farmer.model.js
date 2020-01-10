@@ -8,8 +8,8 @@ var farmerSchema = Schema({
     tasa : String,
     coffes : String,
     address : String,
-    contact : String,
-    image : String
+    image : String,
+    url : String
 })
 
 module.exports = mongoose.model('Farmer', farmerSchema)

@@ -86,64 +86,23 @@ function setImagen(req, res) {
     var historyID = req.params.id;
 
     if(req.files){
-        var file_path = req.files.image.path;
-        console.log(file_path);
+        
+        History.findById(historyID, async (err) => {
+            if (err) return res.status(500).send({ message: 'Error en la peticion' })
+                
+            var result = await cloudinary.v2.uploader.upload(req.files.image.path)
 
-        var file_split = file_path.split('\\');
-        console.log(file_split);
+                History.findByIdAndUpdate(historyID, { image: result.public_id, url: result.url }, { new: true }, (err, historyUpdate) => {
+                    if (err) return res.status(500).send({ message: 'Error en la peticion' })
 
-        var file_name = file_split[3];
-        console.log(file_name);
-
-        var ext_xplit = file_name.split('\.');
-        console.log(ext_xplit);
-
-        var file_ext = ext_xplit[1];
-        console.log(file_ext);
-
-        if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif'){
-            
-            History.findOne({_id: historyID}).exec( async (err, history)=>{
-                if(err) return res.status(500).send({message: "Error en la peticion"});
-                var result = await cloudinary.v2.uploader.upload(file_path);
-                if(history){
-                    History.findByIdAndUpdate(historyID, { image : result.public_id, url : result.url}, {new:true},(err, result)=>{
-                        if(err) return res.status(500).send({message: 'Error en la peticion'})
-                        
-                        if(!result) return res.status(404).send({message: 'no se a podido actualizar la historia'})
-                        
-                        if(result){
-                            console.log(result)
-                            return res.status(200).send({ result })      
-                        }
-                    })
-                }else{
-                    return removeFilerOfUploads(res, file_path, 'No tienes permiso para actualizar esta historia')
-                }
-            });            
-        }else{
-            return removeFilerOfUploads(res, file_path, 'Extension no valida')
-        }
+                    if (historyUpdate) {
+                        console.log(result)
+                        console.log(historyUpdate)
+                        return res.status(200).send({ result: historyUpdate })
+                    }
+                })
+        })
     }
-}
-
-function removeFilerOfUploads(res, file_path, message) {
-    fs.unlink(file_path, (err)=>{
-        return res.status(200).send({message: message})
-    })
-}
-
-function getImageFile(req, res) {
-    var image_file = req.params.imageFile;
-    var path_file = './src/uploads/history/' + image_file;
-
-    fs.exists(path_file, (exists) =>{
-        if(exists){
-            res.sendFile(path.resolve(path_file));
-        }else{
-            res.status(200).send({message: 'no existe la imagen'})
-        }
-    })
 }
 
 module.exports = {

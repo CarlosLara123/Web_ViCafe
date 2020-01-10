@@ -14,7 +14,7 @@ api.post('/publication/add', md_auth.ensureAuth,PublicationController.addPublica
 api.post('/upload-image-publication/:id', [md_auth.ensureAuth, md_subir], PublicationController.subirImagen);
 api.get('/publication/all', PublicationController.getAllPublications);
 api.get('/publication/:id', PublicationController.getOnePublication);
-api.get('/get-image-publication/:imageFile', PublicationController.getImageFile);
+// api.get('/get-image-publication/:imageFile', PublicationController.getImageFile);
 api.put('/publication/update/:id', PublicationController.updateOnePublication);
 api.delete('/publication/delete/:id', PublicationController.deleteOnePublication);
 module.exports = api;
