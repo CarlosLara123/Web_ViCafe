@@ -34,8 +34,10 @@ function subirImagen(req, res) {
         console.log(file_ext);
 
         if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif' || file_ext == 'jfif') {
-            Publication.findById(publicationId, async (err) => {
+            Publication.findById(publicationId, async (err, data) => {
                 if (err) return res.status(500).send({ message: 'Error en la peticion' })
+                
+                if(!data) return res.status(500).send({ message: 'EROOOOOOOOR' })
                 var result = await cloudinary.v2.uploader.upload(file_path)
 
                 Publication.findByIdAndUpdate(publicationId, { image: result.public_id, url: result.url }, { new: true }, (err, publicationUpdate) => {
